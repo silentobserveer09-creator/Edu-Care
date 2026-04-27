@@ -93,45 +93,106 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, serverTimestamp, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // 🔥 Your Firebase Config
         const firebaseConfig = {
           apiKey: "AIzaSyDLqadfjNno17c7NqeO38l93IabAYcAl1c",
           authDomain: "edu-care-ada5e.firebaseapp.com",
           projectId: "edu-care-ada5e",
           storageBucket: "edu-care-ada5e.firebasestorage.app",
           messagingSenderId: "82331443866",
-          appId: "1:82331443866:web:9ccd56f9c970aafaa37523",
-          measurementId: "G-TNB42F3C50"
+          appId: "1:82331443866:web:9ccd56f9c970aafaa37523"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // Auth Function
         window.auth = () => {
-            if(document.getElementById('uid').value === 'Chandan Web Studio' && document.getElementById('pass').value === 'Chand@n-2008/') {
+            const u = document.getElementById('uid').value;
+            const p = document.getElementById('pass').value;
+            if(u === 'Chandan Web Studio' && p === 'Chand@n-2008/') {
                 document.getElementById('login').style.display = 'none';
-            } else alert('Invalid Credentials!');
+            } else {
+                alert('Invalid Credentials!');
+            }
         };
 
-        // Attach Functions
-        window.del = async (col, id) => { if(confirm("Delete this?")) await deleteDoc(doc(db, col, id)); };
+        // Delete Function
+        window.del = async (col, id) => { 
+            if(confirm("Delete this?")) {
+                try {
+                    await deleteDoc(doc(db, col, id));
+                } catch(e) { alert("Error deleting: " + e.message); }
+            }
+        };
 
-        document.getElementById('addBannerBtn').onclick = () => addDoc(collection(db, "banners"), { imageUrl: bImg.value, link: bLink.value });
-        document.getElementById('addCatBtn').onclick = () => addDoc(collection(db, "categories"), { title: catT.value });
-        document.getElementById('addConBtn').onclick = () => addDoc(collection(db, "dynamic_content"), { categoryId: catS.value, title: conT.value, description: conD.value, image: conI.value, link: conL.value });
-        document.getElementById('addSchBtn').onclick = () => addDoc(collection(db, "scholarships"), { title: sT.value, imageUrl: sI.value, link: sL.value, description: sD.value });
-        document.getElementById('addNotBtn').onclick = () => addDoc(collection(db, "notices"), { title: nT.value, description: nD.value, timestamp: serverTimestamp() });
-        document.getElementById('upTickBtn').onclick = () => setDoc(doc(db, "highlight", "main"), { text: tick.value });
+        // Add Functions with explicit element values
+        document.getElementById('addBannerBtn').onclick = async () => {
+            const img = document.getElementById('bImg').value;
+            const lnk = document.getElementById('bLink').value;
+            if(!img) return alert("Enter image URL");
+            await addDoc(collection(db, "banners"), { imageUrl: img, link: lnk });
+            alert("Banner Added!");
+            document.getElementById('bImg').value = '';
+        };
 
-        // Listeners for Admin List
+        document.getElementById('addCatBtn').onclick = async () => {
+            const title = document.getElementById('catT').value;
+            if(!title) return alert("Enter Title");
+            await addDoc(collection(db, "categories"), { title: title });
+            alert("Category Created!");
+            document.getElementById('catT').value = '';
+        };
+
+        document.getElementById('addConBtn').onclick = async () => {
+            await addDoc(collection(db, "dynamic_content"), { 
+                categoryId: document.getElementById('catS').value, 
+                title: document.getElementById('conT').value, 
+                description: document.getElementById('conD').value, 
+                image: document.getElementById('conI').value, 
+                link: document.getElementById('conL').value 
+            });
+            alert("Content Added!");
+        };
+
+        document.getElementById('addSchBtn').onclick = async () => {
+            await addDoc(collection(db, "scholarships"), { 
+                title: document.getElementById('sT').value, 
+                imageUrl: document.getElementById('sI').value, 
+                link: document.getElementById('sL').value, 
+                description: document.getElementById('sD').value 
+            });
+            alert("Scholarship Added!");
+        };
+
+        document.getElementById('addNotBtn').onclick = async () => {
+            await addDoc(collection(db, "notices"), { 
+                title: document.getElementById('nT').value, 
+                description: document.getElementById('nD').value, 
+                timestamp: serverTimestamp() 
+            });
+            alert("Notice Posted!");
+        };
+
+        document.getElementById('upTickBtn').onclick = async () => {
+            const text = document.getElementById('tick').value;
+            await setDoc(doc(db, "highlight", "main"), { text: text });
+            alert("Ticker Updated!");
+        };
+
+        // Listeners to show list in Admin Panel
         const sync = (col, elId, field) => {
             onSnapshot(collection(db, col), (snap) => {
                 document.getElementById(elId).innerHTML = snap.docs.map(d => `
                     <div class="list-item">
-                        <span>${d.data()[field]}</span>
+                        <span>${d.data()[field] || 'No Title'}</span>
                         <button onclick="del('${col}', '${d.id}')" class="btn-red">Delete</button>
                     </div>
                 `).join('');
-                if(col === 'categories') document.getElementById('catS').innerHTML = snap.docs.map(d => `<option value="${d.id}">${d.data().title}</option>`).join('');
+                // Update dropdown if it's categories
+                if(col === 'categories') {
+                    document.getElementById('catS').innerHTML = snap.docs.map(d => `<option value="${d.id}">${d.data().title}</option>`).join('');
+                }
             });
         };
 

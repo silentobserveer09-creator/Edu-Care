@@ -9,21 +9,37 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root { --primary: #6366f1; --secondary: #a855f7; --surface: rgba(255, 255, 255, 0.8); }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; color: #1e293b; padding-bottom: 140px; overflow-x: hidden; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; color: #1e293b; padding-bottom: 140px; overflow-x: hidden; margin: 0; }
+        
+        /* UI Elements */
         .gradient-header { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); border-radius: 0 0 40px 40px; }
-        .glass { background: var(--surface); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.03); border-radius: 24px; }
+        .glass { background: var(--surface); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.03); border-radius: 24px; }
+        
+        /* Animations */
         .page-transition { animation: slideIn 0.3s ease-out; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .grid-item:active { transform: scale(0.95); transition: 0.2s; }
-        #slider-wrapper { display: flex; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
-        .slide-img { min-width: 100%; height: 180px; object-fit: cover; border-radius: 24px; }
-        .nav-capsule { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; height: 70px; background: #0f172a; border-radius: 100px; display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
+        .active-scale:active { transform: scale(0.95); transition: 0.1s; }
+
+        /* Banner Slider - 16:9 Ratio */
+        #slider-container { width: 100%; position: relative; overflow: hidden; border-radius: 24px; aspect-ratio: 16 / 9; background: #eee; }
+        #slider-wrapper { display: flex; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); height: 100%; }
+        .slide-img { min-width: 100%; height: 100%; object-fit: cover; }
+
+        /* Navigation Capsule */
+        .nav-capsule { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 400px; height: 70px; background: #0f172a; border-radius: 100px; display: flex; justify-content: space-around; align-items: center; z-index: 1000; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
         .nav-link { color: #64748b; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: 0.3s; cursor: pointer; }
         .nav-link.active { color: #fff; }
-        .section { display: none; } .section.active { display: block; }
-        .ticker-container { position: fixed; bottom: 105px; width: 100%; background: #fff; border-top: 1px solid #f1f5f9; padding: 10px 0; z-index: 99; overflow: hidden; }
-        .ticker-text { display: inline-block; white-space: nowrap; animation: ticker 20s linear infinite; font-weight: 600; color: #6366f1; }
+        .nav-link.active i { color: #818cf8; transform: translateY(-2px); }
+
+        .section { display: none; } 
+        .section.active { display: block; }
+
+        /* Ticker */
+        .ticker-container { position: fixed; bottom: 105px; width: 100%; background: #fff; border-top: 1px solid #f1f5f9; padding: 12px 0; z-index: 99; overflow: hidden; }
+        .ticker-text { display: inline-block; white-space: nowrap; animation: ticker 25s linear infinite; font-weight: 700; color: #4f46e5; }
         @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+        /* Info Overlays */
         .info-overlay { position: fixed; inset: 0; background: #f8fafc; z-index: 2000; display: none; overflow-y: auto; padding: 25px; }
         .info-overlay.active { display: block; animation: overlayUp 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         @keyframes overlayUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
@@ -31,86 +47,99 @@
 </head>
 <body>
 
+    <!-- Header -->
     <header class="gradient-header pt-12 pb-24 px-6 text-white relative">
         <div class="flex justify-between items-center">
             <div>
-                <h1 class="text-3xl font-extrabold">Edu Care</h1>
-                <p class="text-indigo-100 text-sm">Empowering Odisha's Students</p>
+                <h1 class="text-3xl font-extrabold tracking-tight">Edu Care</h1>
+                <p class="text-indigo-100 text-sm opacity-90">Empowering Odisha's Students</p>
             </div>
-            <button onclick="navigateTo('notices')" class="bg-white/20 p-3 rounded-2xl backdrop-blur-md active:scale-90 transition">
+            <button onclick="navigateTo('notices')" class="bg-white/20 p-3 rounded-2xl backdrop-blur-md active-scale">
                 <i data-lucide="bell" class="w-6 h-6"></i>
             </button>
         </div>
     </header>
 
     <main class="px-5 -mt-12">
-        <!-- Dashboard -->
+        <!-- Dashboard Section -->
         <div id="dashboard" class="section active page-transition">
-            <div class="glass overflow-hidden mb-8 h-[180px] shadow-xl">
-                <div id="slider-wrapper"></div>
+            <div id="slider-container" class="glass shadow-xl mb-8">
+                <div id="slider-wrapper">
+                    <!-- Banners will load here -->
+                </div>
             </div>
+
             <div id="grid-container" class="grid grid-cols-2 gap-4">
-                <div onclick="window.open('https://odia-tutor-solutions.netlify.app/')" class="grid-item glass p-5 flex flex-col items-center">
-                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-3"><i data-lucide="book"></i></div>
-                    <span class="text-sm font-bold">Solutions</span>
+                <div onclick="window.open('https://odia-tutor-solutions.netlify.app/')" class="glass p-6 flex flex-col items-center active-scale transition">
+                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-3"><i data-lucide="book-open"></i></div>
+                    <span class="text-sm font-bold text-slate-700">Solutions</span>
                 </div>
-                <div onclick="navigateTo('scholarships')" class="grid-item glass p-5 flex flex-col items-center">
+                <div onclick="navigateTo('scholarships')" class="glass p-6 flex flex-col items-center active-scale transition">
                     <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center mb-3"><i data-lucide="graduation-cap"></i></div>
-                    <span class="text-sm font-bold">Scholarships</span>
+                    <span class="text-sm font-bold text-slate-700">Scholarships</span>
                 </div>
+                <!-- Dynamic grid items load here -->
             </div>
         </div>
 
         <!-- Dynamic Grid View -->
         <div id="dynamic-view" class="section page-transition">
-            <button onclick="window.history.back()" class="flex items-center gap-2 mb-6 font-bold text-indigo-600"><i data-lucide="chevron-left"></i> Back</button>
-            <h2 id="dynamic-title" class="text-2xl font-bold mb-6">Section</h2>
+            <button onclick="navigateTo('dashboard')" class="flex items-center gap-2 mb-6 font-bold text-indigo-600"><i data-lucide="chevron-left"></i> Back</button>
+            <h2 id="dynamic-title" class="text-2xl font-bold mb-6">Explore Content</h2>
             <div id="dynamic-content-list" class="space-y-4"></div>
         </div>
 
-        <!-- Scholarships -->
+        <!-- Scholarship View -->
         <div id="scholarships" class="section page-transition">
-            <button onclick="window.history.back()" class="flex items-center gap-2 mb-6 font-bold text-indigo-600"><i data-lucide="chevron-left"></i> Back</button>
-            <h2 class="text-2xl font-bold mb-6">Scholarships</h2>
+            <button onclick="navigateTo('dashboard')" class="flex items-center gap-2 mb-6 font-bold text-indigo-600"><i data-lucide="chevron-left"></i> Back</button>
+            <h2 class="text-2xl font-bold mb-6 text-slate-800">Scholarships</h2>
             <div id="scholarship-list" class="space-y-6"></div>
         </div>
 
-        <!-- Notices -->
+        <!-- Notice Section -->
         <div id="notices" class="section page-transition">
-            <h2 class="text-2xl font-bold mb-6">Notice Board</h2>
+            <h2 class="text-2xl font-bold mb-6 text-slate-800">Notice Board</h2>
             <div id="notice-list" class="space-y-4"></div>
         </div>
 
-        <!-- Info -->
+        <!-- Info Section -->
         <div id="info" class="section page-transition">
-            <h2 class="text-2xl font-bold mb-6">Information</h2>
+            <h2 class="text-2xl font-bold mb-6 text-slate-800">App Info</h2>
             <div class="glass p-6 space-y-4">
-                <div onclick="openInfo('About Edu Care', 'Edu Care is Odisha\'s leading digital educational platform.')" class="flex justify-between items-center p-4 bg-white/50 rounded-2xl active:bg-indigo-50 transition">
-                    <span class="flex items-center gap-3 font-semibold"><i data-lucide="info" class="w-5 h-5 text-indigo-500"></i> About Us</span>
+                <div onclick="openInfo('About Edu Care', 'Edu Care is a premium educational portal designed for Odisha students. We provide class solutions, scholarships, and real-time updates for a better learning experience.')" class="flex justify-between items-center p-4 bg-white/50 rounded-2xl active-scale transition">
+                    <span class="flex items-center gap-3 font-semibold text-slate-700"><i data-lucide="info" class="text-indigo-500"></i> About Us</span>
                     <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i>
                 </div>
-                <div onclick="openInfo('Privacy Policy', 'We value your privacy.')" class="flex justify-between items-center p-4 bg-white/50 rounded-2xl active:bg-indigo-50 transition">
-                    <span class="flex items-center gap-3 font-semibold"><i data-lucide="shield-check" class="w-5 h-5 text-indigo-500"></i> Privacy Policy</span>
+                <div onclick="openInfo('Privacy Policy', 'Your privacy is our priority. Edu Care does not collect personal data. All academic content provided is free for student use.')" class="flex justify-between items-center p-4 bg-white/50 rounded-2xl active-scale transition">
+                    <span class="flex items-center gap-3 font-semibold text-slate-700"><i data-lucide="shield-check" class="text-indigo-500"></i> Privacy Policy</span>
                     <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i>
                 </div>
-                <div onclick="openInfo('Terms & Conditions', 'Educational use only.')" class="flex justify-between items-center p-4 bg-white/50 rounded-2xl active:bg-indigo-50 transition">
-                    <span class="flex items-center gap-3 font-semibold"><i data-lucide="file-text" class="w-5 h-5 text-indigo-500"></i> Terms & Conditions</span>
+                <div onclick="openInfo('Terms & Conditions', 'Content provided is for educational use only. Users are advised to verify sensitive information with official government websites.')" class="flex justify-between items-center p-4 bg-white/50 rounded-2xl active-scale transition">
+                    <span class="flex items-center gap-3 font-semibold text-slate-700"><i data-lucide="file-text" class="text-indigo-500"></i> Terms & Conditions</span>
                     <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i>
                 </div>
             </div>
+            <button onclick="window.open('https://youtube.com/@educare_07')" class="mt-10 w-full bg-red-600 text-white py-5 rounded-3xl font-bold flex items-center justify-center gap-3 shadow-xl active-scale transition">
+                <i data-lucide="youtube"></i> Subscribe Our Channel
+            </button>
         </div>
     </main>
 
+    <!-- Info Overlay (About/Privacy/Terms) -->
     <div id="info-overlay" class="info-overlay">
-        <div class="flex justify-between items-center mb-8">
+        <div class="flex justify-between items-center mb-10">
             <h2 id="info-overlay-title" class="text-2xl font-bold text-indigo-600"></h2>
-            <button onclick="closeInfo()" class="p-2 bg-slate-100 rounded-full"><i data-lucide="x"></i></button>
+            <button onclick="closeInfo()" class="p-3 bg-slate-100 rounded-full active-scale"><i data-lucide="x"></i></button>
         </div>
-        <div id="info-overlay-content" class="text-slate-600 leading-relaxed text-lg"></div>
+        <div id="info-overlay-content" class="text-slate-600 leading-relaxed text-lg font-medium"></div>
     </div>
 
-    <div class="ticker-container"><div class="ticker-text" id="ticker-box">Connecting to Edu Care Database...</div></div>
+    <!-- Highlight Ticker -->
+    <div class="ticker-container">
+        <div class="ticker-text" id="ticker-box">Welcome to Edu Care Odisha... Loading latest news...</div>
+    </div>
 
+    <!-- Navigation -->
     <nav class="nav-capsule">
         <div onclick="navigateTo('dashboard')" class="nav-link active" id="btn-dashboard"><i data-lucide="home"></i><span class="text-[10px] font-bold">Home</span></div>
         <div onclick="navigateTo('notices')" class="nav-link" id="btn-notices"><i data-lucide="bell"></i><span class="text-[10px] font-bold">Notice</span></div>
@@ -121,29 +150,35 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // 🔥 REPLACE WITH YOUR CONFIG
         const firebaseConfig = {
           apiKey: "AIzaSyDLqadfjNno17c7NqeO38l93IabAYcAl1c",
           authDomain: "edu-care-ada5e.firebaseapp.com",
           projectId: "edu-care-ada5e",
           storageBucket: "edu-care-ada5e.firebasestorage.app",
           messagingSenderId: "82331443866",
-          appId: "1:82331443866:web:9ccd56f9c970aafaa37523",
-          measurementId: "G-TNB42F3C50"
+          appId: "1:82331443866:web:9ccd56f9c970aafaa37523"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // --- GLOBAL NAVIGATION ---
         window.navigateTo = (id, data = null) => {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             const target = document.getElementById(id);
             if(target) target.classList.add('active');
+
+            // Set Nav Active
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            let activeBtnId = id;
-            if(id === 'scholarships' || id === 'dynamic-view') activeBtnId = 'dashboard';
-            const activeBtn = document.getElementById('btn-' + activeBtnId);
-            if(activeBtn) activeBtn.classList.add('active');
-            if(id === 'dynamic-view' && data) renderDynamic(data);
+            let mainNavId = id;
+            if(id === 'scholarships' || id === 'dynamic-view') mainNavId = 'dashboard';
+            const btn = document.getElementById('btn-' + mainNavId);
+            if(btn) btn.classList.add('active');
+
+            if(id === 'dynamic-view' && data) renderDynamicContent(data);
+
+            // History management
             if(!history.state || history.state.section !== id) {
                 history.pushState({ section: id, data: data }, '', '#' + id);
             }
@@ -156,6 +191,7 @@
             navigateTo(section, data);
         };
 
+        // --- INFO OVERLAY ---
         window.openInfo = (title, content) => {
             document.getElementById('info-overlay-title').innerText = title;
             document.getElementById('info-overlay-content').innerText = content;
@@ -163,44 +199,97 @@
         };
         window.closeInfo = () => document.getElementById('info-overlay').classList.remove('active');
 
-        // Firestore Listeners
+        // --- DATA LOADERS ---
+        
+        // 1. Slider (Auto-Sliding)
+        onSnapshot(collection(db, "banners"), (snap) => {
+            const wrapper = document.getElementById('slider-wrapper');
+            const data = snap.docs.map(d => d.data());
+            if(data.length > 0) {
+                wrapper.innerHTML = data.map(s => `
+                    <img src="${s.imageUrl}" class="slide-img" 
+                    onerror="this.src='https://placehold.co/600x400/indigo/white?text=Edu+Care'" 
+                    onclick="window.open('${s.link}')">
+                `).join('');
+                setupAutoSlide(data.length);
+            } else {
+                wrapper.innerHTML = `<div class="slide-img flex items-center justify-center bg-indigo-50 text-indigo-300 font-bold">No Banner Added</div>`;
+            }
+        });
+
+        function setupAutoSlide(count) {
+            let idx = 0;
+            if(window.bannerTimer) clearInterval(window.bannerTimer);
+            window.bannerTimer = setInterval(() => {
+                idx = (idx + 1) % count;
+                const wrap = document.getElementById('slider-wrapper');
+                if(wrap) wrap.style.transform = `translateX(-${idx * 100}%)`;
+            }, 4000);
+        }
+
+        // 2. Dynamic Categories
         onSnapshot(collection(db, "categories"), (snap) => {
             const grid = document.getElementById('grid-container');
-            document.querySelectorAll('.dyn-cat').forEach(e => e.remove());
+            document.querySelectorAll('.dyn-cat').forEach(el => el.remove());
             snap.docs.forEach(doc => {
-                const d = doc.data();
-                const el = document.createElement('div');
-                el.className = 'grid-item dyn-cat glass p-5 flex flex-col items-center';
-                el.onclick = () => navigateTo('dynamic-view', { id: doc.id, title: d.title });
-                el.innerHTML = `<div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mb-3"><i data-lucide="layout"></i></div><span class="text-sm font-bold text-center">${d.title}</span>`;
-                grid.appendChild(el);
+                const cat = doc.data();
+                const div = document.createElement('div');
+                div.className = 'glass p-6 flex flex-col items-center dyn-cat active-scale transition';
+                div.onclick = () => navigateTo('dynamic-view', { id: doc.id, title: cat.title });
+                div.innerHTML = `<div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mb-3"><i data-lucide="layers"></i></div><span class="text-sm font-bold text-center text-slate-700">${cat.title}</span>`;
+                grid.appendChild(div);
             });
             lucide.createIcons();
         });
 
-        function renderDynamic(cat) {
+        // 3. Dynamic Content Rendering
+        function renderDynamicContent(cat) {
             document.getElementById('dynamic-title').innerText = cat.title;
             const list = document.getElementById('dynamic-content-list');
+            list.innerHTML = '<p class="text-center py-10 opacity-40">Loading...</p>';
+            
             onSnapshot(query(collection(db, "dynamic_content"), where("categoryId", "==", cat.id)), (snap) => {
-                list.innerHTML = snap.docs.map(d => `
-                    <div class="glass overflow-hidden page-transition">
-                        ${d.data().image ? `<img src="${d.data().image}" class="w-full h-40 object-cover">` : ''}
-                        <div class="p-4"><h3 class="font-bold">${d.data().title}</h3><p class="text-sm opacity-70">${d.data().description}</p>
-                        ${d.data().link ? `<a href="${d.data().link}" class="inline-block mt-3 text-indigo-600 font-bold">Open Link →</a>` : ''}</div>
-                    </div>
-                `).join('') || '<p class="text-center py-10 opacity-50">No content found</p>';
+                list.innerHTML = snap.docs.map(d => {
+                    const item = d.data();
+                    return `
+                        <div class="glass overflow-hidden page-transition">
+                            ${item.image ? `<img src="${item.image}" class="w-full h-44 object-cover" onerror="this.style.display='none'">` : ''}
+                            <div class="p-5">
+                                <h3 class="font-bold text-slate-800 text-lg">${item.title}</h3>
+                                <p class="text-sm text-slate-500 mt-1">${item.description}</p>
+                                ${item.link ? `<a href="${item.link}" target="_blank" class="inline-block mt-4 text-indigo-600 font-bold border-b-2 border-indigo-100">Open Link →</a>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('') || '<p class="text-center py-10 opacity-40">No items added here yet.</p>';
             });
         }
 
-        onSnapshot(collection(db, "banners"), (snap) => {
-            document.getElementById('slider-wrapper').innerHTML = snap.docs.map(d => `<img src="${d.data().imageUrl}" class="slide-img" onclick="window.open('${d.data().link}')">`).join('');
-        });
-        onSnapshot(query(collection(db, "notices"), orderBy("timestamp", "desc")), (snap) => {
-            document.getElementById('notice-list').innerHTML = snap.docs.map(d => `<div class="glass p-5 border-l-4 border-indigo-500"><h3 class="font-bold">${d.data().title}</h3><p class="text-sm opacity-70 mt-1">${d.data().description}</p></div>`).join('');
-        });
+        // 4. Scholarships
         onSnapshot(collection(db, "scholarships"), (snap) => {
-            document.getElementById('scholarship-list').innerHTML = snap.docs.map(d => `<div class="glass overflow-hidden shadow-sm"><img src="${d.data().imageUrl}" class="w-full h-44 object-cover"><div class="p-5"><h3 class="font-bold text-lg">${d.data().title}</h3><a href="${d.data().link}" class="mt-4 block text-center py-3 bg-indigo-50 rounded-xl text-indigo-700 font-bold">Apply Now</a></div></div>`).join('');
+            document.getElementById('scholarship-list').innerHTML = snap.docs.map(d => `
+                <div class="glass overflow-hidden">
+                    <img src="${d.data().imageUrl}" class="w-full h-48 object-cover" onerror="this.src='https://placehold.co/600x400?text=Scholarship'">
+                    <div class="p-6">
+                        <h3 class="font-bold text-xl">${d.data().title}</h3>
+                        <p class="text-sm text-slate-500 mt-2">${d.data().description}</p>
+                        <a href="${d.data().link}" class="mt-6 block text-center py-4 bg-indigo-600 text-white rounded-2xl font-bold shadow-lg shadow-indigo-100">Apply Now</a>
+                    </div>
+                </div>
+            `).join('');
         });
+
+        // 5. Notices
+        onSnapshot(query(collection(db, "notices"), orderBy("timestamp", "desc")), (snap) => {
+            document.getElementById('notice-list').innerHTML = snap.docs.map(d => `
+                <div class="glass p-6 border-l-4 border-indigo-500">
+                    <h3 class="font-bold text-slate-800 text-lg">${d.data().title}</h3>
+                    <p class="text-sm text-slate-500 mt-2 leading-relaxed">${d.data().description}</p>
+                </div>
+            `).join('');
+        });
+
+        // 6. News Ticker
         onSnapshot(collection(db, "highlight"), (snap) => {
             if(!snap.empty) document.getElementById('ticker-box').innerText = snap.docs[0].data().text;
         });

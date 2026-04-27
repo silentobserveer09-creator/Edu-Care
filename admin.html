@@ -8,7 +8,8 @@
     <style>
         body { background: #f1f5f9; font-family: sans-serif; padding: 20px; }
         .card { background: white; border-radius: 20px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        input, textarea, select { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 12px; margin-top: 5px; margin-bottom: 15px; }
+        input, textarea, select { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 12px; margin-top: 5px; margin-bottom: 15px; outline: none; }
+        input:focus { border-color: #6366f1; }
         .btn { padding: 12px 24px; border-radius: 12px; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; }
         .btn-blue { background: #6366f1; color: white; width: 100%; }
         .btn-red { background: #fee2e2; color: #ef4444; padding: 5px 12px; font-size: 11px; border-radius: 8px; }
@@ -19,73 +20,74 @@
 <body>
 
     <div id="login">
-        <div class="max-w-sm w-full">
-            <h1 class="text-2xl font-bold mb-6 text-center">Admin Access</h1>
+        <div class="max-w-sm w-full text-center">
+            <h1 class="text-3xl font-bold mb-8">Edu Care Admin</h1>
             <input type="text" id="uid" placeholder="Admin ID">
             <input type="password" id="pass" placeholder="Password">
-            <button onclick="auth()" class="btn btn-blue">Login</button>
+            <button onclick="auth()" class="btn btn-blue mt-4">Unlock Panel</button>
         </div>
     </div>
 
     <div class="max-w-4xl mx-auto">
         <div class="flex justify-between items-center mb-8">
-            <h1 class="text-3xl font-bold">Control Panel</h1>
-            <button onclick="location.reload()" class="text-red-500 font-bold">Logout</button>
+            <h1 class="text-3xl font-bold">Admin Dashboard</h1>
+            <button onclick="location.reload()" class="text-red-500 font-bold">Log Out</button>
         </div>
 
         <!-- Banners -->
         <div class="card">
-            <h2 class="text-xl font-bold mb-4 text-indigo-600">Slider Banners</h2>
-            <input type="text" id="bImg" placeholder="Image URL">
-            <input type="text" id="bLink" placeholder="Redirect Link">
-            <button id="addBannerBtn" class="btn btn-blue">Add Banner</button>
+            <h2 class="text-xl font-bold mb-4 text-indigo-600">1. Slider Banners</h2>
+            <input type="text" id="bImg" placeholder="Direct Image URL">
+            <input type="text" id="bLink" placeholder="Redirect Link (Website/YouTube)">
+            <button onclick="saveBanner()" class="btn btn-blue">Upload Banner</button>
             <div id="list-banners" class="mt-4"></div>
         </div>
 
-        <!-- Categories & Content -->
+        <!-- Dynamic Grid & Content -->
         <div class="card border-2 border-indigo-100">
-            <h2 class="text-xl font-bold mb-4 text-indigo-600">Grid Categories & Content</h2>
-            <div class="p-4 bg-indigo-50 rounded-xl mb-6">
-                <input type="text" id="catT" placeholder="New Grid Item Name">
-                <button id="addCatBtn" class="btn btn-blue">Create Grid Item</button>
+            <h2 class="text-xl font-bold mb-4 text-indigo-600">2. Grid Categories & Content</h2>
+            <div class="p-5 bg-indigo-50 rounded-2xl mb-6">
+                <p class="font-bold mb-2">Create New Grid Item (Category)</p>
+                <input type="text" id="catT" placeholder="Grid Item Name (e.g. Job News)">
+                <button onclick="saveCat()" class="btn btn-blue">Create Grid Item</button>
                 <div id="list-categories" class="mt-4"></div>
             </div>
             
-            <p class="font-bold mb-2">Add Content to Grid Item:</p>
+            <p class="font-bold mb-2">Add Data to Created Item:</p>
             <select id="catS"></select>
-            <input type="text" id="conT" placeholder="Title">
-            <textarea id="conD" placeholder="Description"></textarea>
+            <input type="text" id="conT" placeholder="Content Title">
+            <textarea id="conD" placeholder="Short Description"></textarea>
             <input type="text" id="conI" placeholder="Image URL (Optional)">
-            <input type="text" id="conL" placeholder="Redirect Link">
-            <button id="addConBtn" class="btn btn-blue">Add Content</button>
+            <input type="text" id="conL" placeholder="Read More Link">
+            <button onclick="saveCon()" class="btn btn-blue">Add Data</button>
             <div id="list-content" class="mt-4"></div>
         </div>
 
         <!-- Scholarship -->
         <div class="card">
-            <h2 class="text-xl font-bold mb-4 text-indigo-600">Scholarships</h2>
-            <input type="text" id="sT" placeholder="Title">
+            <h2 class="text-xl font-bold mb-4 text-indigo-600">3. Scholarship Updates</h2>
+            <input type="text" id="sT" placeholder="Scholarship Name">
             <input type="text" id="sI" placeholder="Image URL">
-            <input type="text" id="sL" placeholder="Link">
-            <textarea id="sD" placeholder="Description"></textarea>
-            <button id="addSchBtn" class="btn btn-blue">Add Scholarship</button>
+            <input type="text" id="sL" placeholder="Apply Link">
+            <textarea id="sD" placeholder="Short Details"></textarea>
+            <button onclick="saveSch()" class="btn btn-blue">Add Scholarship</button>
             <div id="list-scholarships" class="mt-4"></div>
         </div>
 
         <!-- Notice -->
         <div class="card">
-            <h2 class="text-xl font-bold mb-4 text-indigo-600">Notices</h2>
-            <input type="text" id="nT" placeholder="Notice Title">
-            <textarea id="nD" placeholder="Full Description"></textarea>
-            <button id="addNotBtn" class="btn btn-blue">Post Notice</button>
+            <h2 class="text-xl font-bold mb-4 text-indigo-600">4. Notice Board</h2>
+            <input type="text" id="nT" placeholder="Notice Heading">
+            <textarea id="nD" placeholder="Full Message / Notice Details"></textarea>
+            <button onclick="saveNot()" class="btn btn-blue">Post Notice</button>
             <div id="list-notices" class="mt-4"></div>
         </div>
 
         <!-- Ticker -->
         <div class="card">
-            <h2 class="text-xl font-bold mb-4 text-indigo-600">Headline Ticker</h2>
-            <input type="text" id="tick" placeholder="News ticker text">
-            <button id="upTickBtn" class="btn btn-blue">Update Ticker</button>
+            <h2 class="text-xl font-bold mb-4 text-indigo-600">5. News Headline Ticker</h2>
+            <input type="text" id="tick" placeholder="Headline text to scroll at bottom">
+            <button onclick="saveTick()" class="btn btn-blue">Update Ticker</button>
         </div>
     </div>
 
@@ -93,7 +95,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, serverTimestamp, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // 🔥 Your Firebase Config
         const firebaseConfig = {
           apiKey: "AIzaSyDLqadfjNno17c7NqeO38l93IabAYcAl1c",
           authDomain: "edu-care-ada5e.firebaseapp.com",
@@ -106,45 +107,35 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Auth Function
+        // -- Global Functions --
         window.auth = () => {
-            const u = document.getElementById('uid').value;
-            const p = document.getElementById('pass').value;
-            if(u === 'Chandan Web Studio' && p === 'Chand@n-2008/') {
+            if(document.getElementById('uid').value === 'Chandan Web Studio' && document.getElementById('pass').value === 'Chand@n-2008/') {
                 document.getElementById('login').style.display = 'none';
-            } else {
-                alert('Invalid Credentials!');
-            }
+            } else alert('Access Denied!');
         };
 
-        // Delete Function
         window.del = async (col, id) => { 
-            if(confirm("Delete this?")) {
-                try {
-                    await deleteDoc(doc(db, col, id));
-                } catch(e) { alert("Error deleting: " + e.message); }
-            }
+            if(confirm("Confirm Delete?")) await deleteDoc(doc(db, col, id)); 
         };
 
-        // Add Functions with explicit element values
-        document.getElementById('addBannerBtn').onclick = async () => {
+        window.saveBanner = async () => {
             const img = document.getElementById('bImg').value;
             const lnk = document.getElementById('bLink').value;
-            if(!img) return alert("Enter image URL");
+            if(!img) return alert("Image URL required");
             await addDoc(collection(db, "banners"), { imageUrl: img, link: lnk });
-            alert("Banner Added!");
+            alert("Banner Live!");
             document.getElementById('bImg').value = '';
         };
 
-        document.getElementById('addCatBtn').onclick = async () => {
+        window.saveCat = async () => {
             const title = document.getElementById('catT').value;
-            if(!title) return alert("Enter Title");
+            if(!title) return alert("Title required");
             await addDoc(collection(db, "categories"), { title: title });
-            alert("Category Created!");
+            alert("Grid Item Created!");
             document.getElementById('catT').value = '';
         };
 
-        document.getElementById('addConBtn').onclick = async () => {
+        window.saveCon = async () => {
             await addDoc(collection(db, "dynamic_content"), { 
                 categoryId: document.getElementById('catS').value, 
                 title: document.getElementById('conT').value, 
@@ -152,10 +143,10 @@
                 image: document.getElementById('conI').value, 
                 link: document.getElementById('conL').value 
             });
-            alert("Content Added!");
+            alert("Content Added Successfully!");
         };
 
-        document.getElementById('addSchBtn').onclick = async () => {
+        window.saveSch = async () => {
             await addDoc(collection(db, "scholarships"), { 
                 title: document.getElementById('sT').value, 
                 imageUrl: document.getElementById('sI').value, 
@@ -165,31 +156,29 @@
             alert("Scholarship Added!");
         };
 
-        document.getElementById('addNotBtn').onclick = async () => {
+        window.saveNot = async () => {
             await addDoc(collection(db, "notices"), { 
                 title: document.getElementById('nT').value, 
                 description: document.getElementById('nD').value, 
                 timestamp: serverTimestamp() 
             });
-            alert("Notice Posted!");
+            alert("Notice Published!");
         };
 
-        document.getElementById('upTickBtn').onclick = async () => {
-            const text = document.getElementById('tick').value;
-            await setDoc(doc(db, "highlight", "main"), { text: text });
-            alert("Ticker Updated!");
+        window.saveTick = async () => {
+            await setDoc(doc(db, "highlight", "main"), { text: document.getElementById('tick').value });
+            alert("Ticker Text Updated!");
         };
 
-        // Listeners to show list in Admin Panel
+        // -- Live Synchronization --
         const sync = (col, elId, field) => {
             onSnapshot(collection(db, col), (snap) => {
                 document.getElementById(elId).innerHTML = snap.docs.map(d => `
                     <div class="list-item">
-                        <span>${d.data()[field] || 'No Title'}</span>
+                        <span class="font-bold text-slate-600">${d.data()[field] || 'Untitled'}</span>
                         <button onclick="del('${col}', '${d.id}')" class="btn-red">Delete</button>
                     </div>
                 `).join('');
-                // Update dropdown if it's categories
                 if(col === 'categories') {
                     document.getElementById('catS').innerHTML = snap.docs.map(d => `<option value="${d.id}">${d.data().title}</option>`).join('');
                 }
